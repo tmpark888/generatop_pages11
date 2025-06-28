@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sacred Million Dollar Activation - Blessing Pages Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1, .header h2 {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: #ffd700; /* Fallback for browsers that don't support background-clip */
+        }
+
+        .controls {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .control-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ffd700;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-family: Georgia, serif;
+        }
+
+        .blessing-editor {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .blessing-card {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .blessing-card label {
+            color: #ffd700;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .blessing-card textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ffd700;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-family: Georgia, serif;
+            resize: vertical;
+        }
+
+        .generate-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: Georgia, serif;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-message {
+            text-align: center;
+            color: #ffd700;
+            font-style: italic;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            max-width: 400px;
+            height: 10px;
+            background-color: rgba(255, 215, 0, 0.2);
+            border-radius: 5px;
+            margin: 20px auto;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* PDF Styles */
+        .pdf-page {
+            width: 190mm;
+            min-height: 277mm;
+            padding: 10mm;
+            background-color: #1a1a2e;
+            color: white;
+            font-family: Georgia, serif;
+            position: relative;
+            box-sizing: border-box;
+            margin: 0 auto 5mm;
+            border: 1px solid #ffd700;
+        }
+        
+        .pdf-page:not(:last-child) {
+            page-break-after: always;
+        }
+
+        .pdf-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .day-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .transmission-section {
+            background-color: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .transmission-title {
+            color: #ffd700;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .blessing-text {
+            font-style: italic;
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            text-align: center;
+            color: white;
+        }
+
+        .lineage-note {
+            text-align: center;
+            font-size: 10px;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .divine-message {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #ffd700;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            line-height: 1.3;
+            color: white;
+        }
+
+        .intention-section, .signs-section, .gratitude-section {
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .write-line {
+            border-bottom: 1px solid #ffd700;
+            height: 16px;
+            margin-bottom: 3px;
+        }
+
+        .cta-section {
+            background-color: rgba(255, 215, 0, 0.05);
+            border: 1px solid #ffd700;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 12px;
+            text-align: center;
+            color: white;
+            font-size: 10px;
+        }
+
+        .cta-title {
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .ps-note {
+            font-style: italic;
+            font-size: 9px;
+            margin-top: 6px;
+            color: #ffd700;
+        }
+
+        .watermark {
+            position: absolute;
+            bottom: 8mm;
+            right: 10mm;
+            font-size: 8px;
+            color: rgba(255, 215, 0, 0.7);
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 8mm;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffd700;
+            font-size: 10px;
+        }
+
+        .sign-line {
+            margin-bottom: 5px;
+            color: white;
+            font-size: 10px;
+        }
+
+        .sign-line .line {
+            border-bottom: 1px solid #ffd700;
+            display: inline-block;
+            width: 120px;
+            height: 12px;
+            margin-left: 5px;
+        }
+
+        /* Hide PDF content by default */
+        #pdfContent {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            visibility: hidden;
+        }
+
+        .error-message {
+            background-color: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff6b6b;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ff6b6b;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message {
+            background-color: rgba(0, 255, 0, 0.1);
+            border: 1px solid #51cf66;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #51cf66;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Sacred Million Dollar Activation 🌟</h1>
+            <h2>Blessing Pages Generator</h2>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="whatsapp">WhatsApp Number (optional):</label>
+                <input type="text" id="whatsapp" placeholder="e.g., +40 123 456 789">
+            </div>
+            <div class="control-group">
+                <label for="email">Email:</label>
+                <input type="text" id="email" value="info@draculamystictour.com">
+            </div>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="blessing-editor" id="blessingEditor">
+            <!-- Blessing cards will be generated here -->
+        </div>
+
+        <button class="generate-btn" onclick="generatePDF()" id="generateBtn">
+            ✨ Generate Sacred PDF ✨
+        </button>
+
+        <div class="loading-message" id="loadingMessage">
+            ✨ Channeling sacred energies into PDF... Please wait... ✨
+        </div>
+
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- PDF Content (hidden) -->
+    <div id="pdfContent"></div>
+
+    <script>
+        const daysOfWeek = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+        
+        const defaultBlessings = [
+            "The 7th seal of Solomon's prosperity opens for you today. Ancient rivers of gold flow toward your soul.",
+            "Sacred energies of my canonized ancestor activate your prosperity consciousness now. You are chosen.",
+            "Divine abundance seeks you through bloodlines of power. Write your intention and let ancient wealth find you.",
+            "The Orthodox mysteries whisper your name. Today, millionaire frequency aligns with your aura.",
+            "Angelic forces of my lineage surround your finances. Supernatural breakthrough incoming.",
+            "Sacred flames of abundance ignite within your spirit. The wealth of centuries flows through you now.",
+            "Ancient prosperity codes embedded in your DNA activate today. Your millionaire destiny awakens.",
+            "The golden thread of my bloodline connects to your soul. Infinite abundance channels through this sacred link.",
+            "Celestial vaults of prosperity unlock for your spirit. Divine wealth streams descend upon you.",
+            "The sacred fire of financial transformation burns within you. Old money blocks dissolve completely.",
+            "Mystical forces align to manifest your deepest wealth desires. The universe conspires for your abundance.",
+            "Ancestral wealth wisdom flows through your consciousness. Ancient secrets of prosperity reveal themselves.",
+            "The Orthodox cross of abundance blesses your financial path. Sacred protection surrounds your money flow.",
+            "Divine money magnetism awakens in your aura. You become an irresistible attractor of wealth.",
+            "The sacred number of your birth date unlocks hidden treasure chambers. Abundance seeks you actively.",
+            "Angelic guardians of prosperity take position around you. Your wealth protection is now complete.",
+            "The mystical key to unlimited abundance turns in your favor. All financial doors open before you.",
+            "Sacred geometry of wealth aligns with your life purpose. Your prosperity path becomes crystal clear.",
+            "The golden light of my lineage illuminates your money consciousness. Millionaire thoughts flood your mind.",
+            "Ancient prosperity rituals activate through your daily practice. Every action multiplies your wealth potential.",
+            "The sacred waters of abundance cleanse your financial karma. Pure prosperity energy flows freely now.",
+            "Divine intervention manifests through unexpected money opportunities. Your breakthrough moment has arrived.",
+            "The mystical rose of prosperity blooms in your heart. Love and abundance merge in perfect harmony.",
+            "Sacred numerology of your soul reveals hidden wealth patterns. Your unique abundance code activates today.",
+            "The Orthodox bell of prosperity rings for your awakening. Divine timing aligns with your money goals.",
+            "Celestial merchants of abundance gather around your spirit. Supernatural business opportunities multiply rapidly.",
+            "The sacred scroll of your wealth destiny unrolls before you. Every step leads to greater prosperity.",
+            "Ancient alchemy transforms your relationship with money. Lead thoughts become golden manifestations.",
+            "The mystical crown of financial sovereignty rests upon your head. You rule your abundance kingdom now.",
+            "Divine completion of your prosperity cycle draws near. The ultimate money breakthrough crystallizes within reach."
+        ];
+
+        const triggers = [
+            "Today's energy peak: This blessing is most powerful in the next 6 hours",
+            "Sarah from Texas: 'Page 7 changed everything - $50K in 2 weeks!'",
+            "Only 1% of souls are ready for this ancient activation",
+            "Your soul frequency matches this blessing for only 24 hours",
+            "Maria sensed your readiness level from 5000 miles away..."
+        ];
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function initializeBlessings() {
+            const editor = document.getElementById('blessingEditor');
+            
+            if (!editor) {
+                showError('Failed to initialize blessing editor');
+                return;
+            }
+            
+            for (let i = 1; i <= 30; i++) {
+                const card = document.createElement('div');
+                card.className = 'blessing-card';
+                
+                const dayOfWeek = daysOfWeek[(i - 1) % 7];
+                
+                card.innerHTML = `
+                    <label for="blessing${i}">Day ${i} - ${dayOfWeek}:</label>
+                    <textarea id="blessing${i}" placeholder="Enter blessing text...">${defaultBlessings[i - 1] || ''}</textarea>
+                `;
+                
+                editor.appendChild(card);
+            }
+        }
+
+        function updateProgress(percentage) {
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (progressBar && progressFill) {
+                progressBar.style.display = 'block';
+                progressFill.style.width = Math.min(100, Math.max(0, percentage)) + '%';
+            }
+        }
+
+        function createPageContent(pageNumber, blessing, whatsapp, email) {
+            const dayOfWeek = daysOfWeek[(pageNumber - 1) % 7];
+            const triggerIndex = Math.floor((pageNumber - 1) / 5) % triggers.length;
+            const trigger = triggers[triggerIndex];
+            
+            // Escape HTML special characters in user input
+            const escapeHtml = (text) => {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            };
+            
+            const safeBlessing = escapeHtml(blessing);
+            const safeWhatsapp = escapeHtml(whatsapp);
+            const safeEmail = escapeHtml(email);
+            
+            return `
+                <div class="pdf-header">
+                    <div class="day-title">🌟 DAY ${pageNumber} - ${dayOfWeek} 🌟</div>
+                </div>
+                
+                <div class="transmission-section">
+                    <div class="transmission-title">💫 MARIA'S SACRED TRANSMISSION FOR YOU:</div>
+                    <div class="blessing-text">"${safeBlessing}"</div>
+                    <div class="lineage-note">~ Channeled through 1500 years of Orthodox power ~</div>
+                </div>
+                
+                <div class="divine-message">
+                    <div class="section-title">🎁 DIVINE MESSAGE:</div>
+                    "You were guided to this page for a reason. The Universe orchestrated this moment because you're READY for your million-dollar breakthrough. This blessing resonated with you TODAY - that's divine timing, not coincidence."
+                </div>
+                
+                <div class="intention-section">
+                    <div class="section-title">📝 MY MONEY INTENTION TODAY:</div>
+                    <div class="write-line"></div>
+                    <div class="write-line"></div>
+                </div>
+                
+                <div class="signs-section">
+                    <div class="section-title">💰 ABUNDANCE SIGNS I NOTICED:</div>
+                    <div class="sign-line">Morning: <span class="line"></span></div>
+                    <div class="sign-line">Afternoon: <span class="line"></span></div>
+                    <div class="sign-line">Evening: <span class="line"></span></div>
+                </div>
+                
+                <div class="gratitude-section">
+                    <div class="section-title">✨ GRATITUDE FOR WHAT I RECEIVED:</div>
+                    <div class="write-line"></div>
+                </div>
+                
+                <div class="cta-section">
+                    <div class="cta-title">🌟 FEELING THE CALL FOR MORE?</div>
+                    <div style="margin-bottom: 8px;">This blessing is just the beginning... There are deeper layers waiting.</div>
+                    <div>When you're ready for the FULL activation → Text Maria: ${safeWhatsapp}</div>
+                    <div class="ps-note">✨ P.S. The fact that you felt drawn to page ${pageNumber} tells Maria everything about your spiritual readiness level... 😉</div>
+                </div>
+                
+                ${pageNumber % 5 === 0 ? `<div style="margin-top: 12px; padding: 8px; background-color: rgba(255, 215, 0, 0.1); border-radius: 6px; text-align: center; font-size: 10px; color: #ffd700;">${escapeHtml(trigger)}</div>` : ''}
+                
+                <div class="watermark">
+                    📧 ${safeEmail}<br>
+                    📱 ${safeWhatsapp}
+                </div>
+                
+                <div class="page-number">${pageNumber}</div>
+            `;
+        }
+
+        async function generatePDF() {
+            const generateBtn = document.getElementById('generateBtn');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const progressBar = document.getElementById('progressBar');
+            const whatsapp = document.getElementById('whatsapp').value || '[WhatsApp Number]';
+            const email = document.getElementById('email').value;
+            
+            // Validate inputs
+            if (!email.trim()) {
+                showError('Please enter an email address');
+                return;
+            }
+            
+            // Check if html2pdf is loaded
+            if (typeof html2pdf === 'undefined') {
+                showError('PDF library not loaded. Please refresh the page and try again.');
+                return;
+            }
+            
+            // Disable button and show loading
+            generateBtn.disabled = true;
+            loadingMessage.style.display = 'block';
+            progressBar.style.display = 'block';
+            
+            try {
+                // Collect all blessings
+                const blessings = [];
+                for (let i = 1; i <= 30; i++) {
+                    const blessingElement = document.getElementById(`blessing${i}`);
+                    if (!blessingElement) {
+                        throw new Error(`Missing blessing element for day ${i}`);
+                    }
+                    const blessing = blessingElement.value || defaultBlessings[i - 1] || '';
+                    blessings.push(blessing);
+                }
+                
+                updateProgress(10);
+                
+                // Create PDF content
+                const pdfContent = document.getElementById('pdfContent');
+                if (!pdfContent) {
+                    throw new Error('PDF content container not found');
+                }
+                
+                // Create all pages as one container
+                const pagesContainer = document.createElement('div');
+                pagesContainer.style.width = '100%';
+                
+                for (let i = 0; i < 30; i++) {
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'pdf-page';
+                    pageDiv.innerHTML = createPageContent(i + 1, blessings[i], whatsapp, email).replace('<div class="pdf-page">', '').replace('</div>', '');
+                    pagesContainer.appendChild(pageDiv);
+                    updateProgress(10 + (i / 30) * 40); // Progress from 10% to 50%
+                }
+                
+                pdfContent.appendChild(pagesContainer);
+                
+                // Make content visible temporarily
+                pdfContent.style.position = 'static';
+                pdfContent.style.left = 'auto';
+                pdfContent.style.top = 'auto';
+                pdfContent.style.visibility = 'visible';
+                
+                updateProgress(60);
+                
+                // Wait for content to render
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                updateProgress(70);
+                
+                // Generate PDF with optimized settings
+                const opt = {
+                    margin: [5, 5, 5, 5],
+                    filename: 'Sacred_Million_Dollar_Activation_Planner.pdf',
+                    image: { 
+                        type: 'jpeg', 
+                        quality: 0.75 
+                    },
+                    html2canvas: { 
+                        scale: 1,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#1a1a2e',
+                        logging: false,
+                        windowWidth: 800,
+                        windowHeight: 1200,
+                        scrollX: 0,
+                        scrollY: 0,
+                        onclone: function(clonedDoc) {
+                            // Ensure proper styling in cloned document
+                            const pages = clonedDoc.querySelectorAll('.pdf-page');
+                            pages.forEach((page, index) => {
+                                page.style.pageBreakAfter = index === pages.length - 1 ? 'avoid' : 'always';
+                            });
+                        }
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait'
+                    },
+                    pagebreak: { 
+                        mode: 'css',
+                        before: '.pdf-page'
+                    }
+                };
+                
+                updateProgress(80);
+                
+                // Generate PDF
+                await html2pdf()
+                    .set(opt)
+                    .from(pdfContent)
+                    .save();
+                
+                updateProgress(100);
+                showSuccess('PDF generated successfully! ✨');
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                showError(`PDF generation failed: ${error.message}`);
+            } finally {
+                // Clean up
+                const pdfContent = document.getElementById('pdfContent');
+                if (pdfContent) {
+                    pdfContent.innerHTML = '';
+                    pdfContent.style.position = 'absolute';
+                    pdfContent.style.left = '-9999px';
+                    pdfContent.style.top = '-9999px';
+                    pdfContent.style.visibility = 'hidden';
+                }
+                
+                // Re-enable button and hide loading
+                generateBtn.disabled = false;
+                loadingMessage.style.display = 'none';
+                progressBar.style.display = 'none';
+                
+                // Reset progress
+                setTimeout(() => {
+                    const progressFill = document.getElementById('progressFill');
+                    if (progressFill) {
+                        progressFill.style.width = '0%';
+                    }
+                }, 2000);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                initializeBlessings();
+                console.log('Application initialized successfully');
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Failed to initialize application');
+            }
+        });
+
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error('Global error:', event.error);
+            showError('An unexpected error occurred. Please refresh the page.');
+        });
+    </script>
+</body>
+</html>
