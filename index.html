@@ -156,29 +156,30 @@
 
         /* PDF Styles */
         .pdf-page {
-            width: 190mm;
-            min-height: 277mm;
-            padding: 10mm;
+            width: 210mm;
+            height: 297mm;
+            padding: 15mm;
             background-color: #1a1a2e;
             color: white;
             font-family: Georgia, serif;
             position: relative;
             box-sizing: border-box;
-            margin: 0 auto 5mm;
-            border: 1px solid #ffd700;
+            margin: 0;
+            page-break-after: always;
+            overflow: hidden;
         }
         
-        .pdf-page:not(:last-child) {
-            page-break-after: always;
+        .pdf-page:last-child {
+            page-break-after: avoid;
         }
 
         .pdf-header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20mm;
         }
 
         .day-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             color: #ffd700;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -189,114 +190,115 @@
             background-color: rgba(255, 215, 0, 0.1);
             border: 2px solid #ffd700;
             border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: 15mm;
+            margin-bottom: 15mm;
         }
 
         .transmission-title {
             color: #ffd700;
-            font-size: 13px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 10mm;
+            text-align: center;
         }
 
         .blessing-text {
             font-style: italic;
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 6px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10mm;
             text-align: center;
             color: white;
         }
 
         .lineage-note {
             text-align: center;
-            font-size: 10px;
+            font-size: 12px;
             color: #ffd700;
-            margin-bottom: 8px;
+            margin-bottom: 10mm;
         }
 
         .divine-message {
             background-color: rgba(0, 0, 0, 0.3);
             border-left: 4px solid #ffd700;
-            padding: 10px;
-            margin-bottom: 12px;
-            font-size: 11px;
-            line-height: 1.3;
+            padding: 12mm;
+            margin-bottom: 15mm;
+            font-size: 13px;
+            line-height: 1.4;
             color: white;
         }
 
         .intention-section, .signs-section, .gratitude-section {
-            margin-bottom: 10px;
+            margin-bottom: 12mm;
         }
 
         .section-title {
             color: #ffd700;
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 11px;
+            margin-bottom: 8mm;
+            font-size: 14px;
         }
 
         .write-line {
             border-bottom: 1px solid #ffd700;
-            height: 16px;
-            margin-bottom: 3px;
+            height: 20px;
+            margin-bottom: 5mm;
         }
 
         .cta-section {
             background-color: rgba(255, 215, 0, 0.05);
             border: 1px solid #ffd700;
-            border-radius: 6px;
-            padding: 10px;
-            margin-top: 12px;
+            border-radius: 8px;
+            padding: 12mm;
+            margin-top: 15mm;
             text-align: center;
             color: white;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .cta-title {
             color: #ffd700;
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 11px;
+            margin-bottom: 8mm;
+            font-size: 14px;
         }
 
         .ps-note {
             font-style: italic;
-            font-size: 9px;
-            margin-top: 6px;
+            font-size: 11px;
+            margin-top: 8mm;
             color: #ffd700;
         }
 
         .watermark {
             position: absolute;
-            bottom: 8mm;
-            right: 10mm;
-            font-size: 8px;
+            bottom: 10mm;
+            right: 15mm;
+            font-size: 10px;
             color: rgba(255, 215, 0, 0.7);
         }
 
         .page-number {
             position: absolute;
-            bottom: 8mm;
+            bottom: 10mm;
             left: 50%;
             transform: translateX(-50%);
             color: #ffd700;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .sign-line {
-            margin-bottom: 5px;
+            margin-bottom: 6mm;
             color: white;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .sign-line .line {
             border-bottom: 1px solid #ffd700;
             display: inline-block;
             width: 120px;
-            height: 12px;
-            margin-left: 5px;
+            height: 16px;
+            margin-left: 8px;
         }
 
         /* Hide PDF content by default */
@@ -578,21 +580,19 @@
                     throw new Error('PDF content container not found');
                 }
                 
-                // Create all pages as one container
-                const pagesContainer = document.createElement('div');
-                pagesContainer.style.width = '100%';
+                // Clear previous content
+                pdfContent.innerHTML = '';
                 
+                // Create pages directly without wrapper
                 for (let i = 0; i < 30; i++) {
                     const pageDiv = document.createElement('div');
                     pageDiv.className = 'pdf-page';
-                    pageDiv.innerHTML = createPageContent(i + 1, blessings[i], whatsapp, email).replace('<div class="pdf-page">', '').replace('</div>', '');
-                    pagesContainer.appendChild(pageDiv);
+                    pageDiv.innerHTML = createPageContent(i + 1, blessings[i], whatsapp, email);
+                    pdfContent.appendChild(pageDiv);
                     updateProgress(10 + (i / 30) * 40); // Progress from 10% to 50%
                 }
                 
-                pdfContent.appendChild(pagesContainer);
-                
-                // Make content visible temporarily
+                // Make content visible temporarily for rendering
                 pdfContent.style.position = 'static';
                 pdfContent.style.left = 'auto';
                 pdfContent.style.top = 'auto';
@@ -601,35 +601,28 @@
                 updateProgress(60);
                 
                 // Wait for content to render
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 updateProgress(70);
                 
                 // Generate PDF with optimized settings
                 const opt = {
-                    margin: [5, 5, 5, 5],
+                    margin: 0,
                     filename: 'Sacred_Million_Dollar_Activation_Planner.pdf',
                     image: { 
                         type: 'jpeg', 
-                        quality: 0.75 
+                        quality: 0.8 
                     },
                     html2canvas: { 
-                        scale: 1,
+                        scale: 1.5,
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: '#1a1a2e',
                         logging: false,
-                        windowWidth: 800,
-                        windowHeight: 1200,
+                        width: 794, // A4 width in pixels at 96 DPI
+                        height: 1123, // A4 height in pixels at 96 DPI
                         scrollX: 0,
-                        scrollY: 0,
-                        onclone: function(clonedDoc) {
-                            // Ensure proper styling in cloned document
-                            const pages = clonedDoc.querySelectorAll('.pdf-page');
-                            pages.forEach((page, index) => {
-                                page.style.pageBreakAfter = index === pages.length - 1 ? 'avoid' : 'always';
-                            });
-                        }
+                        scrollY: 0
                     },
                     jsPDF: { 
                         unit: 'mm', 
