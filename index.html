@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sacred Million Dollar Activation - Blessing Pages Generator</title>
+    <!-- Используем только html2pdf.js - он включает в себя всё необходимое -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
@@ -332,7 +333,6 @@
             margin-left: 5px;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -610,31 +610,34 @@
                 pdfContainer.style.left = 'auto';
                 
                 // Wait for content to render
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 updateProgress(60);
                 
-                // PDF generation options
+                // PDF generation options - УЛУЧШЕННЫЕ настройки для 30 страниц
                 const opt = {
                     margin: 0,
                     filename: 'Sacred_Million_Dollar_Activation_Planner.pdf',
                     image: { 
                         type: 'jpeg', 
-                        quality: 0.85 
+                        quality: 0.75  // Снижено для экономии памяти
                     },
                     html2canvas: { 
-                        scale: 2,
+                        scale: 1.5,  // Снижено для экономии памяти
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: '#1a1a2e',
                         logging: false,
                         width: 432,
-                        height: 648
+                        height: 648,
+                        timeout: 30000,  // Увеличен таймаут до 30 секунд
+                        removeContainer: true
                     },
                     jsPDF: { 
                         unit: 'pt', 
                         format: [432, 648], 
                         orientation: 'portrait',
-                        compress: true
+                        compress: true,
+                        precision: 2
                     },
                     pagebreak: { 
                         mode: ['avoid-all', 'css'],
@@ -645,47 +648,27 @@
                 updateProgress(70);
                 console.log('Starting PDF generation with html2pdf...');
                 
-                // Generate PDF
-                // Используем jsPDF напрямую
-const { jsPDF } = window.jspdf;
-
-const doc = new jsPDF({
-    unit: 'pt',
-    format: [432, 648],
-    orientation: 'portrait',
-    compress: true
-});
-
-// Генерация каждой страницы отдельно
-for (let i = 0; i < blessings.length; i++) {
-    const pageDiv = document.createElement('div');
-    pageDiv.className = 'pdf-page';
-    pageDiv.innerHTML = createPageContent(i + 1, blessings[i], whatsapp, email);
-    document.body.appendChild(pageDiv); // временно добавим страницу в DOM
-
-    const canvas = await html2canvas(pageDiv, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#1a1a2e',
-        allowTaint: true
-    });
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.85);
-    if (i !== 0) doc.addPage();
-    doc.addImage(imgData, 'JPEG', 0, 0, 432, 648);
-
-    document.body.removeChild(pageDiv); // удалим после добавления
-}
-
-doc.save('Sacred_Million_Dollar_Activation_Planner.pdf');
+                // Увеличиваем таймаут для генерации 30 страниц
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('PDF generation timeout (60 seconds)')), 60000);
+                });
+                
+                const pdfPromise = html2pdf().set(opt).from(pdfContainer).save();
+                
+                // Ждем либо успешную генерацию, либо таймаут
+                await Promise.race([pdfPromise, timeoutPromise]);
                 
                 updateProgress(100);
                 console.log('PDF generated successfully!');
-                showSuccess('PDF generated successfully! ✨');
+                showSuccess('✨ PDF с 30 страницами успешно создан и скачан! ✨');
                 
             } catch (error) {
                 console.error('PDF generation error:', error);
-                showError(`PDF generation failed: ${error.message}`);
+                if (error.message.includes('timeout')) {
+                    showError('⏰ Генерация заняла слишком много времени. Попробуйте еще раз или обновите страницу.');
+                } else {
+                    showError(`PDF generation failed: ${error.message}`);
+                }
             } finally {
                 // Clean up
                 const pdfContainer = document.getElementById('pdfContainer');
