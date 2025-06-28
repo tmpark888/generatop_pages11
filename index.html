@@ -156,17 +156,16 @@
 
         /* PDF Styles */
         .pdf-page {
-            width: 210mm;
-            height: 297mm;
-            padding: 15mm;
+            width: 6in;
+            height: 9in;
+            padding: 0.5in;
             background-color: #1a1a2e;
             color: white;
             font-family: Georgia, serif;
             position: relative;
             box-sizing: border-box;
-            margin: 0;
+            margin: 0 auto 5mm;
             page-break-after: always;
-            overflow: hidden;
         }
         
         .pdf-page:last-child {
@@ -175,11 +174,11 @@
 
         .pdf-header {
             text-align: center;
-            margin-bottom: 20mm;
+            margin-bottom: 0.3in;
         }
 
         .day-title {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             color: #ffd700;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -190,115 +189,115 @@
             background-color: rgba(255, 215, 0, 0.1);
             border: 2px solid #ffd700;
             border-radius: 10px;
-            padding: 15mm;
-            margin-bottom: 15mm;
+            padding: 0.2in;
+            margin-bottom: 0.2in;
         }
 
         .transmission-title {
             color: #ffd700;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 10mm;
+            margin-bottom: 8px;
             text-align: center;
         }
 
         .blessing-text {
             font-style: italic;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 10mm;
+            font-size: 11px;
+            line-height: 1.4;
+            margin-bottom: 8px;
             text-align: center;
             color: white;
         }
 
         .lineage-note {
             text-align: center;
-            font-size: 12px;
+            font-size: 9px;
             color: #ffd700;
-            margin-bottom: 10mm;
+            margin-bottom: 8px;
         }
 
         .divine-message {
             background-color: rgba(0, 0, 0, 0.3);
             border-left: 4px solid #ffd700;
-            padding: 12mm;
-            margin-bottom: 15mm;
-            font-size: 13px;
-            line-height: 1.4;
+            padding: 0.15in;
+            margin-bottom: 0.15in;
+            font-size: 10px;
+            line-height: 1.3;
             color: white;
         }
 
         .intention-section, .signs-section, .gratitude-section {
-            margin-bottom: 12mm;
+            margin-bottom: 0.15in;
         }
 
         .section-title {
             color: #ffd700;
             font-weight: bold;
-            margin-bottom: 8mm;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-size: 10px;
         }
 
         .write-line {
             border-bottom: 1px solid #ffd700;
-            height: 20px;
-            margin-bottom: 5mm;
+            height: 14px;
+            margin-bottom: 4px;
         }
 
         .cta-section {
             background-color: rgba(255, 215, 0, 0.05);
             border: 1px solid #ffd700;
-            border-radius: 8px;
-            padding: 12mm;
-            margin-top: 15mm;
+            border-radius: 6px;
+            padding: 0.1in;
+            margin-top: 0.15in;
             text-align: center;
             color: white;
-            font-size: 12px;
+            font-size: 9px;
         }
 
         .cta-title {
             color: #ffd700;
             font-weight: bold;
-            margin-bottom: 8mm;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-size: 10px;
         }
 
         .ps-note {
             font-style: italic;
-            font-size: 11px;
-            margin-top: 8mm;
+            font-size: 8px;
+            margin-top: 6px;
             color: #ffd700;
         }
 
         .watermark {
             position: absolute;
-            bottom: 10mm;
-            right: 15mm;
-            font-size: 10px;
+            bottom: 0.3in;
+            right: 0.5in;
+            font-size: 8px;
             color: rgba(255, 215, 0, 0.7);
         }
 
         .page-number {
             position: absolute;
-            bottom: 10mm;
+            bottom: 0.3in;
             left: 50%;
             transform: translateX(-50%);
             color: #ffd700;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         .sign-line {
-            margin-bottom: 6mm;
+            margin-bottom: 4px;
             color: white;
-            font-size: 12px;
+            font-size: 9px;
         }
 
         .sign-line .line {
             border-bottom: 1px solid #ffd700;
             display: inline-block;
-            width: 120px;
-            height: 16px;
-            margin-left: 8px;
+            width: 80px;
+            height: 12px;
+            margin-left: 5px;
         }
 
         /* Hide PDF content by default */
@@ -580,17 +579,19 @@
                     throw new Error('PDF content container not found');
                 }
                 
-                // Clear previous content
-                pdfContent.innerHTML = '';
-                
                 // Create pages directly without wrapper
+                const pagesContainer = document.createElement('div');
+                pagesContainer.style.width = '100%';
+                
                 for (let i = 0; i < 30; i++) {
                     const pageDiv = document.createElement('div');
                     pageDiv.className = 'pdf-page';
                     pageDiv.innerHTML = createPageContent(i + 1, blessings[i], whatsapp, email);
-                    pdfContent.appendChild(pageDiv);
+                    pagesContainer.appendChild(pageDiv);
                     updateProgress(10 + (i / 30) * 40); // Progress from 10% to 50%
                 }
+                
+                pdfContent.appendChild(pagesContainer);
                 
                 // Make content visible temporarily for rendering
                 pdfContent.style.position = 'static';
@@ -605,28 +606,28 @@
                 
                 updateProgress(70);
                 
-                // Generate PDF with optimized settings
+                // Generate PDF with optimized settings for 6x9 inch format
                 const opt = {
-                    margin: 0,
+                    margin: [5, 5, 5, 5],
                     filename: 'Sacred_Million_Dollar_Activation_Planner.pdf',
                     image: { 
                         type: 'jpeg', 
-                        quality: 0.8 
+                        quality: 0.75 
                     },
                     html2canvas: { 
-                        scale: 1.5,
+                        scale: 1,
                         useCORS: true,
                         allowTaint: true,
                         backgroundColor: '#1a1a2e',
                         logging: false,
-                        width: 794, // A4 width in pixels at 96 DPI
-                        height: 1123, // A4 height in pixels at 96 DPI
+                        width: 432, // 6 inches at 72 DPI
+                        height: 648, // 9 inches at 72 DPI
                         scrollX: 0,
                         scrollY: 0
                     },
                     jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
+                        unit: 'in', 
+                        format: [6, 9], 
                         orientation: 'portrait'
                     },
                     pagebreak: { 
