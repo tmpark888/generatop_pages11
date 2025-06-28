@@ -332,6 +332,7 @@
             margin-left: 5px;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -645,11 +646,38 @@
                 console.log('Starting PDF generation with html2pdf...');
                 
                 // Generate PDF
-                const pdf = html2pdf().set(opt).from(pdfContainer);
-                
-                updateProgress(90);
-                
-                await pdf.save();
+                // Используем jsPDF напрямую
+const { jsPDF } = window.jspdf;
+
+const doc = new jsPDF({
+    unit: 'pt',
+    format: [432, 648],
+    orientation: 'portrait',
+    compress: true
+});
+
+// Генерация каждой страницы отдельно
+for (let i = 0; i < blessings.length; i++) {
+    const pageDiv = document.createElement('div');
+    pageDiv.className = 'pdf-page';
+    pageDiv.innerHTML = createPageContent(i + 1, blessings[i], whatsapp, email);
+    document.body.appendChild(pageDiv); // временно добавим страницу в DOM
+
+    const canvas = await html2canvas(pageDiv, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#1a1a2e',
+        allowTaint: true
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.85);
+    if (i !== 0) doc.addPage();
+    doc.addImage(imgData, 'JPEG', 0, 0, 432, 648);
+
+    document.body.removeChild(pageDiv); // удалим после добавления
+}
+
+doc.save('Sacred_Million_Dollar_Activation_Planner.pdf');
                 
                 updateProgress(100);
                 console.log('PDF generated successfully!');
